@@ -20,6 +20,7 @@ const up = async () => {
   await $`docker-compose -f docker-compose.local.yml --env-file .env.local up -d`;
   sleep(3000);
   await initializeMongoCluster();
+  await generateSeedScripts();
   await seed();
   await index();
 };
@@ -29,9 +30,20 @@ const down = async () => {
   await $`docker-compose -f docker-compose.local.yml --env-file .env.local down`;
 };
 
+const generateSeedScripts = async () => {
+  console.log(chalk.green('generating seed scripts'));
+  let groupCount = await question('How many groups do your want to generate? ');
+  let userCount = await question('How many users do your want to generate? ');
+  await $`yarn cross-env GROUPS_COUNT=${groupCount} USERS_COUNT=${userCount} node scripts/generators/generateAll.js`;
+  await $`npx prettier --write ./**/*.seed.js`;
+};
+
 if (argv._.length > 1) {
   const mode = argv._.pop();
   switch (mode) {
+    case 'generateSeedScripts':
+      await generateSeedScripts();
+      break;
     case 'seed':
       await seed();
       break;

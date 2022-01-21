@@ -1,4 +1,9 @@
 {
+  "name": "graphql-playground",
+  "version": "1.0.0",
+  "main": "dist/app.js",
+  "author": "James Tan <james@predictivehire.com>",
+  "license": "MIT",
   "dependencies": {
     "apollo-server": "^3.4.0",
     "apollo-server-core": "^3.4.0",
@@ -15,17 +20,14 @@
     "typedi": "^0.10.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^6.0.0-alpha.3",
     "@types/pluralize": "^0.0.29",
+    "cross-env": "^7.0.3",
     "env-cmd": "^10.1.0",
     "tsc-watch": "^4.6.0",
     "typescript": "^4.5.5",
     "zx": "^4.3.0"
   },
-  "name": "graphql-playground",
-  "version": "1.0.0",
-  "main": "dist/app.js",
-  "author": "James Tan <james@predictivehire.com>",
-  "license": "MIT",
   "scripts": {
     "start": "rimraf dist && env-cmd -f .env.local tsc-watch -p tsconfig.json --onSuccess \"node dist/app.js\"",
     "ph": "yarn zx ./scripts/bootstrap.mjs"
