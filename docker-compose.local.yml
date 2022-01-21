@@ -1,0 +1,23 @@
+version: "3.7"
+
+services:
+  # primary
+  mongodb-primary:
+    image: mongo:4.0
+    restart: always
+    hostname: mongodb-primary
+    container_name: mongodb-primary
+    command: mongod --noauth --replSet rs0 --bind_ip_all
+    volumes:
+      - ./db/mongo:/scripts
+    ports:
+      - 27666:27017
+
+  # secondary
+  mongodb-secondary:
+    image: mongo:4.0
+    hostname: mongodb-secondary
+    container_name: mongodb-secondary
+    command: mongod --noauth --replSet rs0 --bind_ip_all
+    ports:
+      - 27999:27017
