@@ -12,10 +12,10 @@ export class GroupRepo {
   groupSecondaryModel: mongoose.Model<GroupDocument>;
 
   async getOneById({ _id }: IFilterGetGroup): Promise<IGroup> {
-    return this.groupSecondaryModel.findOne({ _id });
+    return this.groupSecondaryModel.findOne({ _id }).lean();
   }
 
   async getManyByIds({ _ids }: IFilterGetGroups): Promise<IGroup[]> {
-    return this.groupSecondaryModel.find({ _id: { $in: _ids } });
+    return this.groupSecondaryModel.find({ _id: { $in: _ids } }).lean();
   }
 }

@@ -1,3 +1,4 @@
+import { UserService } from './../user/user.service';
 import { GetGroupDto } from './dtos/getGroup.dto';
 import { GroupRepo } from './group.repo';
 import { Inject, Service } from 'typedi';
@@ -9,9 +10,18 @@ export class GroupService {
   @Inject()
   groupRepo: GroupRepo;
 
-  async getGroup(getGroupDto: GetGroupDto): Promise<GroupEntity> {
-    const group = await this.groupRepo.getOneById(getGroupDto);
+  @Inject()
+  userService: UserService;
 
+  async getGroup(getGroupDto: GetGroupDto): Promise<GroupEntity> {
+    const groupRepoObject = await this.groupRepo.getOneById(getGroupDto);
+
+    const userCount = await this.userService.getUserCountByGroupId({
+      groupId: getGroupDto._id,
+    });
+
+    // assemble group before converting to groupEntity
+    const group = { ...groupRepoObject, userCount };
     const groupEntity = GroupEntity.fromRepoObject(group);
     return groupEntity;
   }

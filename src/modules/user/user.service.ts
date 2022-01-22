@@ -3,6 +3,7 @@ import { GetUserDto } from './dtos/getUser.dto';
 import { UserEntity } from './user.entity';
 import { UserRepo } from './user.repo';
 import { Inject, Service } from 'typedi';
+import { GetUserCountDto } from './dtos/getUserCount.dto';
 
 @Service()
 export class UserService {
@@ -23,5 +24,11 @@ export class UserService {
 
     const userEntities = users.map((user) => UserEntity.fromRepoObject(user));
     return userEntities;
+  }
+
+  async getUserCountByGroupId(
+    getUserCountDto: GetUserCountDto
+  ): Promise<number> {
+    return this.userRepo.getUserCountByGroupId({ ...getUserCountDto });
   }
 }
