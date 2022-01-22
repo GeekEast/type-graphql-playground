@@ -15,6 +15,7 @@ yarn start
 ```
 
 ## Example Query
+
 - query
 ```graphql
 query GetGroup($getGroupFilter: GetGroupDto!) {
@@ -72,3 +73,12 @@ query GetUsers($getUsersDto: GetUsersDto!) {
   }
 }
 ```
+
+## Field Resolver and Data Loader
+
+### Business Context
+- One group could have many users.
+- One user could belongs to multiple groups
+- The relationship between group and user is managed in the user side only. User has one field called `groupIds` (we will migrate to userGroupMapping collections to manage the relationship in future)
+- **We want to get a group with number of users**
+- **We want to get a list groups with number of users of each group**
