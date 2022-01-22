@@ -45,9 +45,17 @@ const generateSeedScripts = async () => {
   await $`npx prettier --write ./**/*.seed.js`;
 };
 
+const monitorDB = async () => {
+  console.log(chalk.green('fetching the mongodb metrics...'));
+  await $`docker exec -it ${primaryContainer} bash `;
+}
+
 if (argv._.length > 1) {
   const mode = argv._.pop();
   switch (mode) {
+    case 'monitorDB':
+      await monitorDB();
+      break;
     case 'generateSeedScripts':
       await generateSeedScripts();
       break;

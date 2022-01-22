@@ -1,4 +1,4 @@
-import { UserService } from './../user/user.service';
+import { UserService } from '../user/user.service';
 import { GetGroupDto } from './dtos/getGroup.dto';
 import { GroupRepo } from './group.repo';
 import { Inject, Service } from 'typedi';
@@ -31,8 +31,9 @@ export class GroupService {
     const groups = await this.groupRepo.getManyByIds(getGroupsDto);
 
     // TODO: improve the N+1 issue when fetch more than 10000 groups at the same time
-    // * Solution 1: add groupIds size limit (similar to pagination)
-    // * Solution 2: make it as one db query
+    // * Solution 1: make it as one db query
+    // * ✅ Solution 2: add index to user's groupIds:
+    // * ref: https://docs.mongodb.com/manual/core/index-multikey/#query-on-the-array-field-as-a-whole
     const groupEntities = Promise.all(
       // N times
       groups.map(async (groupRepoObject) => {
