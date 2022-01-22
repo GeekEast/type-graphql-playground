@@ -103,6 +103,11 @@ query GetUsers($getUsersDto: GetUsersDto!) {
 ### Traps
 - index on nested array allows duplicates inside.
 
+### Experiment Data
+- 2000 groups, 20000 users
+- query by 2000 groupIds
+- avg time: `350ms`
+
 ## Reference
 - [Can graphql return aggregate counts?](https://stackoverflow.com/questions/34321688/can-graphql-return-aggregate-counts)
 - [Mongoose Virtual](https://github.com/Automattic/mongoose/issues/5762)
