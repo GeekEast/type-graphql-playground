@@ -19,6 +19,12 @@ yarn start
 yarn project generateSeedScripts
 yarn project seed
 ```
+
+## Monitor MongoDB
+```sh
+# will pop up an url for monitoring data
+db.enableFreeMonitoring() 
+```
 ## Example Query
 
 - query
@@ -93,3 +99,7 @@ query GetUsers($getUsersDto: GetUsersDto!) {
 - Data loader cannot improve the performance
 - When you fetch user detail (e.g firstName, lastName and email) via groups, the code might send same DB query since some user might in multiple groups, dataloader could help the de-duplicate the db query and improvement the performance
 - But in this business context, you need a statistic metric called `userCount`, so the fanned out queries have no duplicate identifiers. In this scenario, it's better to optimise the performance by merge multiple queries into one in the database level. (in relational database, it' probably the `join` operation)
+
+## Reference
+- [Can graphql return aggregate counts?](https://stackoverflow.com/questions/34321688/can-graphql-return-aggregate-counts)
+- [Mongoose Virtual](https://github.com/Automattic/mongoose/issues/5762)
