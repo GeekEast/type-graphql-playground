@@ -1,3 +1,5 @@
+const { question } = require('zx');
+
 const primaryContainer = 'mongodb-primary';
 
 const initializeMongoCluster = async () => {
@@ -31,6 +33,11 @@ const down = async () => {
 };
 
 const generateSeedScripts = async () => {
+  let shouldGenSeedScripts = await question(
+    'Do you need to generate new seed scripts? (yes/no)'
+  );
+
+  if (shouldGenSeedScripts.trim().toLowerCase() !== 'yes') return;
   console.log(chalk.green('generating seed scripts'));
   let groupCount = await question('How many groups do your want to generate? ');
   let userCount = await question('How many users do your want to generate? ');

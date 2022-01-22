@@ -18,9 +18,14 @@ export class GroupEntity {
   @Expose({ toClassOnly: true })
   name: string;
 
-  static fromRepoObject(group: IGroup): GroupEntity {
-    if (!group) return null;
-    return plainToInstance(GroupEntity, group, {
+  @Field(() => Number)
+  @Expose({ toClassOnly: true })
+  @Transform(({ obj }) => obj.userCount || 0, { toClassOnly: true })
+  userCount: number;
+
+  static fromRepoObject(obj: any): GroupEntity {
+    if (!obj) return null;
+    return plainToInstance(GroupEntity, obj, {
       excludeExtraneousValues: true,
       exposeUnsetFields: false,
     });
