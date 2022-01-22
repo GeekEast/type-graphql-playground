@@ -32,14 +32,16 @@ export class GroupResolver {
 
   // * ====================================== Query & Mutation ============================================
   @Query(() => GroupEntity, { name: 'GetGroup' })
-  async filter(@Arg('filter') getGroupDto: GetGroupDto): Promise<GroupEntity> {
-    return;
+  async getGroup(
+    @Arg('filter') getGroupDto: GetGroupDto
+  ): Promise<GroupEntity> {
+    return this.groupService.getGroup(getGroupDto);
   }
 
   @Query(() => [GroupEntity], { name: 'GetGroups' })
   async getGroups(
     @Arg('filter') getGroupsDto: GetGroupsDto
-  ): Promise<[GroupEntity]> {
-    return;
+  ): Promise<GroupEntity[]> {
+    return this.groupService.getGroups(getGroupsDto);
   }
 }

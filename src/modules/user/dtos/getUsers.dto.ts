@@ -2,7 +2,7 @@ import { ArrayNotEmpty, IsMongoId } from 'class-validator';
 import { Field, InputType } from 'type-graphql';
 
 @InputType()
-export class GetGroupsDto {
+export class GetUsersDto {
   @Field(() => [String])
   @IsMongoId({ each: true })
   @ArrayNotEmpty()

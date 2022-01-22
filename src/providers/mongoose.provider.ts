@@ -15,7 +15,7 @@ export class MongooseProvider {
   static async provide() {
     await this.initMongoConnection();
 
-    // * register all other models here
+    // * register all models here
     this.registerModel<UserDocument>('user', UserSchema);
     this.registerModel<GroupDocument>('group', GroupSchema);
   }
@@ -53,12 +53,19 @@ export class MongooseProvider {
     let primaryDBUri = OFFLINE_DOCUMENTDB_PRIMARY_URI;
     let secondaryDBUri = OFFLINE_DOCUMENTDB_SECONDARY_URI;
 
-    this.primaryDB = await mongoose
-      .createConnection(primaryDBUri, { autoIndex: false })
-      .asPromise();
+    console.log(primaryDBUri);
+    this.primaryDB = await mongoose.createConnection(primaryDBUri, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+      useFindAndModify: false,
+      autoIndex: false,
+    });
 
-    this.secondaryDB = await mongoose
-      .createConnection(secondaryDBUri, { autoIndex: false })
-      .asPromise();
+    this.secondaryDB = await mongoose.createConnection(secondaryDBUri, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+      useFindAndModify: false,
+      autoIndex: false,
+    });
   }
 }

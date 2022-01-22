@@ -1,8 +1,8 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 interface IBaseUser {
-  _id: mongoose.ObjectId;
-  groupIds: mongoose.ObjectId[];
+  _id: mongoose.Types.ObjectId;
+  groupIds: mongoose.Types.ObjectId[];
   email: string;
   firstName: string;
   lastName: string;

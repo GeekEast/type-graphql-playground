@@ -6,15 +6,17 @@ import { GroupResolver } from './modules/group/group.resolver';
 import { buildSchemaSync } from 'type-graphql';
 import Container from 'typedi';
 import {
-  ApolloServerPluginInlineTraceDisabled,
+  ApolloServerPluginInlineTrace,
   ApolloServerPluginLandingPageLocalDefault,
 } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import { FARGATE_EXPRESS_PORT } from './const';
+import { registerProviders } from './providers';
 
 const main = async () => {
+  await registerProviders();
   const schema = buildSchemaSync({
-    resolvers: [GroupResolver],
+    resolvers: [GroupResolver, UserResolver],
     container: Container,
   });
 
@@ -22,7 +24,10 @@ const main = async () => {
     schema,
     introspection: true,
     debug: true,
-    plugins: [ApolloServerPluginLandingPageLocalDefault()],
+    plugins: [
+      ApolloServerPluginInlineTrace(),
+      ApolloServerPluginLandingPageLocalDefault(),
+    ],
   });
 
   const app = express();
