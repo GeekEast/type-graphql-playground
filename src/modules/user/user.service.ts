@@ -4,6 +4,7 @@ import { UserEntity } from './user.entity';
 import { UserRepo } from './user.repo';
 import { Inject, Service } from 'typedi';
 import { GetUserCountDto } from './dtos/getUserCount.dto';
+import { GetUserCountsDto } from './dtos/getUserCounts.dto';
 
 @Service()
 export class UserService {
@@ -13,9 +14,7 @@ export class UserService {
   async getUser(getUserDto: GetUserDto): Promise<UserEntity> {
     const user = await this.userRepo.getOneById(getUserDto);
 
-    console.log(user);
     const userEntity = UserEntity.fromRepoObject(user);
-    console.log(userEntity);
     return userEntity;
   }
 
@@ -30,5 +29,11 @@ export class UserService {
     getUserCountDto: GetUserCountDto
   ): Promise<number> {
     return this.userRepo.getUserCountByGroupId({ ...getUserCountDto });
+  }
+
+  async getUserCountsByGroupIds(
+    getUserCountsDto: GetUserCountsDto
+  ): Promise<Record<string, { totalUsers: number; name: string }>> {
+    return this.userRepo.getUserCountsByGroupIds({ ...getUserCountsDto });
   }
 }

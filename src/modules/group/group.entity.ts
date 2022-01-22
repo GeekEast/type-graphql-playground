@@ -2,6 +2,7 @@ import { IGroup } from './group.schema';
 import { Field, ID, ObjectType } from 'type-graphql';
 import { Service } from 'typedi';
 import { Expose, plainToInstance, Transform } from 'class-transformer';
+import { isValidObjectId } from 'mongoose';
 
 @Service()
 @ObjectType()
@@ -9,9 +10,13 @@ export class GroupEntity {
   @Field(() => ID)
   @Expose({ toClassOnly: true })
   // ! avoid using value
-  @Transform(({ obj }: { obj: IGroup }) => obj._id?.toString(), {
-    toClassOnly: true,
-  })
+  @Transform(
+    ({ obj }: { obj: IGroup }) =>
+      isValidObjectId(obj?._id) ? obj._id.toString() : obj?._id,
+    {
+      toClassOnly: true,
+    }
+  )
   _id: string;
 
   @Field(() => String)

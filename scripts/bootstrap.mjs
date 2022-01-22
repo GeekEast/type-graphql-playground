@@ -42,13 +42,13 @@ const generateSeedScripts = async () => {
   let groupCount = await question('How many groups do your want to generate? ');
   let userCount = await question('How many users do your want to generate? ');
   await $`yarn cross-env GROUPS_COUNT=${groupCount} USERS_COUNT=${userCount} node scripts/generators/generateAll.js`;
-  await $`npx prettier --write ./**/*.seed.js`;
+  await $`npx prettier --write ./**/*.seed.js groupIds.json`;
 };
 
 const monitorDB = async () => {
   console.log(chalk.green('fetching the mongodb metrics...'));
   await $`docker exec -it ${primaryContainer} bash `;
-}
+};
 
 if (argv._.length > 1) {
   const mode = argv._.pop();

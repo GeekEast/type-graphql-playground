@@ -27,26 +27,17 @@ export class GroupService {
   }
 
   async getGroups(getGroupsDto: GetGroupsDto): Promise<GroupEntity[]> {
-    // 1 time
-    const groups = await this.groupRepo.getManyByIds(getGroupsDto);
-
-    // TODO: improve the N+1 issue when fetch more than 10000 groups at the same time
-    // TODO: improve the memory issue because data aggregation job is processed in service layer.
-    // * Solution 1: make it as one db query
+    // * ✅ Solution 1: make it as only 1 db query
     // * ✅ Solution 2: add index to user's groupIds:
     // * Solution 3: add working daemon for long-running task based on solution 1
     // * ref: https://docs.mongodb.com/manual/core/index-multikey/#query-on-the-array-field-as-a-whole
-    const groupEntities = Promise.all(
-      // N times
-      groups.map(async (groupRepoObject) => {
-        const userCount = await this.userService.getUserCountByGroupId({
-          groupId: groupRepoObject._id.toString(),
-        });
-        const group = { ...groupRepoObject, userCount };
-        return GroupEntity.fromRepoObject(group);
-      })
-    );
 
+    const groupWithUserCount = await this.userService.getUserCountsByGroupIds({
+      groupIds: getGroupsDto._ids,
+    });
+    const groupEntities = getGroupsDto._ids.map((id) =>
+      GroupEntity.fromRepoObject({ _id: id, ...groupWithUserCount[id] })
+    );
     return groupEntities;
   }
 }
