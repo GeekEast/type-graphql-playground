@@ -30,6 +30,6 @@ export class UserRepo {
       .find({
         groupIds: { $elemMatch: { $eq: groupId } },
       })
-      .count();
+      .countDocuments();
   }
 }

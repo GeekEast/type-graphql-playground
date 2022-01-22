@@ -14,6 +14,11 @@ yarn project up
 yarn start
 ```
 
+## Generate Fake Data
+```sh
+yarn project generateSeedScripts
+yarn project seed
+```
 ## Example Query
 
 - query
