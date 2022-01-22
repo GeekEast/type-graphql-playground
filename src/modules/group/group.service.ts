@@ -27,10 +27,14 @@ export class GroupService {
   }
 
   async getGroups(getGroupsDto: GetGroupsDto): Promise<GroupEntity[]> {
+    // 1 time
     const groups = await this.groupRepo.getManyByIds(getGroupsDto);
 
     // TODO: improve the N+1 issue when fetch more than 10000 groups at the same time
+    // * Solution 1: add groupIds size limit (similar to pagination)
+    // * Solution 2: make it as one db query
     const groupEntities = Promise.all(
+      // N times
       groups.map(async (groupRepoObject) => {
         const userCount = await this.userService.getUserCountByGroupId({
           groupId: groupRepoObject._id.toString(),
