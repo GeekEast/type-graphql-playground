@@ -9,7 +9,7 @@ import { Expose, plainToInstance, Transform, Type } from 'class-transformer';
 export class GroupEntity {
   @Field(() => ID)
   @Expose({ toClassOnly: true })
-  // ! avoid using value
+  // ! avoid using `value`
   @Transform(({ obj }: { obj: IGroup }) => obj._id?.toString(), {
     toClassOnly: true,
   })
@@ -24,10 +24,17 @@ export class GroupEntity {
   @Transform(({ obj }) => obj.userCount || 0, { toClassOnly: true })
   userCount: number;
 
-  @Field(() => UserEntity, { nullable: true })
+  // * first approach
+  @Field(() => [UserEntity], { nullable: true })
   @Expose({ toClassOnly: true })
   @Type(() => UserEntity)
-  users: [UserEntity];
+  users: UserEntity[];
+
+  // * second approach
+  @Field(() => [UserEntity], { nullable: true })
+  @Expose({ toClassOnly: true })
+  @Type(() => UserEntity)
+  users2: UserEntity[];
 
   static fromRepoObject(obj: any): GroupEntity {
     if (!obj) return null;

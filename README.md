@@ -1,7 +1,11 @@
 
 
-# Type Graphql Playground
-
+# Type-graphql Playground
+  - [Kick off](#kick-off)
+  - [Graphql example](#graphql-example)
+  - [Regenerate Data](#regenerate-data)
+  - [Statistics](#statistics)
+  - [Next Phase](#next-phase)
 ## Kick off
 ```sh
 # install dependency
@@ -14,50 +18,50 @@ yarn project up
 yarn start
 ```
 
-## Generate Fake Data
-```sh
-yarn project generateSeedScripts
-yarn project seed
-```
-## Example Query
-
-- query
+## Graphql example
+- query http://localhost:12305/graphql
 ```graphql
 query GetGroup($getGroupFilter: GetGroupDto!) {
   GetGroup(filter: $getGroupFilter) {
     _id
     name
+    userCount
   }
 }
 
+# query with datalodare loadMany() without aggregation help
 query GetGroups($getGroupsFilter: GetGroupsDto!) {
   GetGroups(filter: $getGroupsFilter) {
     _id
     name
+    userCount
+    users {
+      _id
+      email
+      firstName
+      lastName
+    }
   }
 }
 
-query GetUser($getUserFilter: GetUserDto!) {
-  GetUser(filter: $getUserFilter) {
+# query with dataloader load() method with optmized mongo aggregation query
+query GetGroupsViaSingleMongoQuery(
+  $getGroupsFilterViaSingleMongoQuery: GetGroupsDto!
+) {
+  GetGroups(filter: $getGroupsFilterViaSingleMongoQuery) {
     _id
-    email
-    firstName
-    lastName
-    groupIds
-  }
-}
-
-query GetUsers($getUsersDto: GetUsersDto!) {
-  GetUsers(filter: $getUsersDto) {
-    _id
-    email
-    firstName
-    lastName
-    groupIds
+    name
+    userCount
+    users2 {
+      _id
+      email
+      firstName
+      lastName
+    }
   }
 }
 ```
-- variables: fill the ids by looking up `db/seed-scripts/*.seed.js`
+- variables: ids is stored in generated `groupIds.json` in project root directory
 ```json
 {
   "getGroupFilter": {
@@ -68,28 +72,41 @@ query GetUsers($getUsersDto: GetUsersDto!) {
       "61eabfc67d720e6372867487"
     ]
   },
-  "getUserFilter": {
-    "_id": "61eabfc6b276ca2b9a87cad3"
-  },
-  "getUsersDto": {
+  "getGroupsFilterViaSingleMongoQuery": {
     "_ids": [
-      "61eabfc6b276ca2b9a87cad3"
+      "61eabfc67d720e6372867487"
     ]
   }
 }
 ```
 
-## Field Resolver and Data Loader
+## Regenerate Data
+```sh
+# generate the seed scripts
+yarn project generateSeedScripts
 
-### Business Context
-- One group could have many users.
-- One user could belongs to multiple groups
-- The relationship between group and user is managed in the user side only. User has one field called `groupIds` (we will migrate to userGroupMapping collections to manage the relationship in future)
-- **We want to get a group with number of users**
-- **We want to get a list groups with number of users of each group**
+# seed data to mongodb
+yarn project seed
+
+# create indices
+yarn project index
+```
+
+## Statistics
+- for query `2000` **groups** with **users**  as sub-document in graphql
+- dataloader has two main functionalities here: **batch** requests (deduplicate) and **cache** request (memory)
+- 
+| Data Loader method  | Aggregation Query | Plain Query |  Time Consumed  | use case                            |
+| :-----------------: | :---------------: | :---------: | :-------------: | ----------------------------------- |
+|   `load(groupId)`   |        ✅         |             |  `600-1000ms`   | huge amount of fanned out promises  |
+| `loadMany(userIds)` |                   |     ✅      | `30000-60000ms` | small amount of fanned out promises |
 
 
-### Analysis
-- Data loader cannot improve the performance
-- When you fetch user detail (e.g firstName, lastName and email) via groups, the code might send same DB query since some user might in multiple groups, dataloader could help the de-duplicate the db query and improvement the performance
-- But in this business context, you need a statistic metric called `userCount`, so the fanned out queries have no duplicate identifiers. In this scenario, it's better to optimise the performance by merge multiple queries into one in the database level. (in relational database, it' probably the `join` operation)
+## Take away
+- Graphql **Flexibility**: Favor `field resolver` to assemble **exterior** fields over assembling in `service` layer.
+- Delegate **cumbersome** assembling logic from `field resolver` to mongodb `aggregate pipeline`.
+
+
+
+## Next Phase
+- How to do performant sorting in graphql layer since field resolver happens after data get fetched from database?

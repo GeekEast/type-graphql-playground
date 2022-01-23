@@ -1,4 +1,8 @@
 node_modules
 dist
+.DS_Store
 
 groupIds.json
+db/mongo/seed-scripts/group.seed.js
+db/mongo/seed-scripts/user.seed.js
+
