@@ -53,7 +53,6 @@ export class MongooseProvider {
     let primaryDBUri = OFFLINE_DOCUMENTDB_PRIMARY_URI;
     let secondaryDBUri = OFFLINE_DOCUMENTDB_SECONDARY_URI;
 
-    console.log(primaryDBUri);
     this.primaryDB = await mongoose.createConnection(primaryDBUri, {
       useUnifiedTopology: true,
       useNewUrlParser: true,

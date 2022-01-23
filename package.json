@@ -24,13 +24,13 @@
     "@types/pluralize": "^0.0.29",
     "cross-env": "^7.0.3",
     "env-cmd": "^10.1.0",
+    "rimraf": "^3.0.2",
     "tsc-watch": "^4.6.0",
     "typescript": "^4.5.5",
-    "rimraf": "^3.0.2",
     "zx": "^4.3.0"
   },
   "scripts": {
-    "start": "rimraf dist && env-cmd -f .env.local tsc-watch -p tsconfig.json --onSuccess \"node dist/app.js\"",
+    "start": "rimraf dist && env-cmd -f .env.local tsc-watch -p tsconfig.json --onSuccess \"node --trace-warnings dist/app.js\"",
     "project": "yarn zx ./scripts/bootstrap.mjs"
   }
 }
