@@ -48,7 +48,7 @@ export class UserRepo {
     groupIds,
   }: IFilterGetUserCounts): Promise<Record<string, number>> {
     const groupObjectIds = groupIds.map((id) => mongoose.Types.ObjectId(id));
-    const result = await this.userSecondaryModel.aggregate([
+    const groupIdUserCountsList = (await this.userSecondaryModel.aggregate([
       {
         $match: {
           groupIds: {
@@ -93,42 +93,25 @@ export class UserRepo {
       {
         $project: {
           _id: 0.0,
-          groupId: {
-            $convert: {
-              input: '$_id',
-              to: 'string',
-            },
-          },
+          groupId: '$_id',
           totalUsers: 1.0,
         },
       },
-      {
-        $group: {
-          _id: null,
-          mappings: {
-            $push: '$$ROOT',
-          },
-        },
-      },
-      {
-        $project: {
-          _id: 0.0,
-          groupIdUserCount: {
-            $arrayToObject: {
-              $map: {
-                input: '$mappings',
-                as: 'el',
-                in: {
-                  k: '$$el.groupId',
-                  v: '$$el.totalUsers',
-                },
-              },
-            },
-          },
-        },
-      },
-    ]);
-    return result[0].groupIdUserCount;
+    ])) as [groupIdUserCountPair];
+
+    type groupIdUserCountPair = {
+      groupId: mongoose.Types.ObjectId;
+      totalUsers: number;
+    };
+
+    const groupIdUserCountMappings = groupIdUserCountsList.reduce(
+      (prev: Record<string, number>, curr: groupIdUserCountPair) => ({
+        ...prev,
+        [curr.groupId.toHexString()]: curr.totalUsers,
+      }),
+      {}
+    );
+    return groupIdUserCountMappings;
   }
 
   async getGroupUsersMappingByGroupIds({
