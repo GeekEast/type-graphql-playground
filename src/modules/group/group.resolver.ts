@@ -17,50 +17,6 @@ export class GroupResolver {
   @Inject()
   userService: UserService;
 
-  // * ============================================= Data Loaders =========================================
-  // * First Approach
-  private usersDataLoader = new DataLoader<string, UserEntity>(
-    async (uniqueUserIds: readonly string[]): Promise<UserEntity[]> => {
-      const users = await this.userService.getUsers({
-        _ids: uniqueUserIds as string[],
-      });
-
-      const dict = users.reduce(
-        (prev: Record<string, UserEntity>, curr: UserEntity) => ({
-          ...prev,
-          [curr._id]: curr,
-        }),
-        {}
-      );
-
-      return uniqueUserIds.map((userId) => dict[userId]);
-    }
-  );
-
-  // * Second Approach
-  private usersDataLoader2 = new DataLoader<string, UserEntity[]>(
-    async (uniqueGroupIds: readonly string[]): Promise<UserEntity[][]> => {
-      const groupIdUsersMapping = await this.userService.getGroupIdUsersMapping(
-        {
-          groupIds: uniqueGroupIds as string[],
-        }
-      );
-      return uniqueGroupIds.map((groupId) => groupIdUsersMapping[groupId]);
-    }
-  );
-
-  // ! Best Optimized
-  private userCountDataloader = new DataLoader<string, number>(
-    async (groupIds: readonly string[]): Promise<number[]> => {
-      const groupIdUserCountMapping =
-        await this.userService.getUserCountsByGroupIds({ groupIds } as {
-          groupIds: string[];
-        });
-
-      return groupIds.map((groupId) => groupIdUserCountMapping[groupId]);
-    }
-  );
-
   // * ============================================= Field Resolvers ======================================
   // * First Approach
   @FieldResolver(() => UserEntity)
@@ -70,19 +26,55 @@ export class GroupResolver {
     const userIds = await this.userService.getUserIdsByGroupId({
       groupId: groupEntity._id,
     });
-    return this.usersDataLoader.loadMany(userIds);
+    const loader = new DataLoader<string, UserEntity>(
+      async (uniqueUserIds: readonly string[]): Promise<UserEntity[]> => {
+        const users = await this.userService.getUsers({
+          _ids: uniqueUserIds as string[],
+        });
+
+        const dict = users.reduce(
+          (prev: Record<string, UserEntity>, curr: UserEntity) => ({
+            ...prev,
+            [curr._id]: curr,
+          }),
+          {}
+        );
+
+        return uniqueUserIds.map((userId) => dict[userId]);
+      }
+    );
+    return loader.loadMany(userIds);
   }
 
   // * Second Approach
   @FieldResolver(() => UserEntity)
   async users2(@Root() groupEntity: GroupEntity): Promise<UserEntity[]> {
-    return this.usersDataLoader2.load(groupEntity._id);
+    const loader = new DataLoader<string, UserEntity[]>(
+      async (uniqueGroupIds: readonly string[]): Promise<UserEntity[][]> => {
+        const groupIdUsersMapping =
+          await this.userService.getGroupIdUsersMapping({
+            groupIds: uniqueGroupIds as string[],
+          });
+        return uniqueGroupIds.map((groupId) => groupIdUsersMapping[groupId]);
+      }
+    );
+    return loader.load(groupEntity._id);
   }
 
   // ! Best Optimized
   @FieldResolver()
   async userCount(@Root() groupEntity: GroupEntity): Promise<number> {
-    return this.userCountDataloader.load(groupEntity._id);
+    const loader = new DataLoader<string, number>(
+      async (groupIds: readonly string[]): Promise<number[]> => {
+        const groupIdUserCountMapping =
+          await this.userService.getUserCountsByGroupIds({ groupIds } as {
+            groupIds: string[];
+          });
+
+        return groupIds.map((groupId) => groupIdUserCountMapping[groupId]);
+      }
+    );
+    return loader.load(groupEntity._id);
   }
 
   // * ====================================== Query & Mutation ============================================
